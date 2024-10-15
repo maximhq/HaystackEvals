@@ -35,8 +35,8 @@ def mape():
 
     payload = request.json
     split_char = payload.get("split_char", ",")
-    ground_truth_documents = payload["ground_truth_documents"].split(split_char)
-    retrieved_documents = payload["retrieved_documents"].split(split_char)
+    ground_truth_documents = payload["ground_truth_documents"].strip().split(split_char)
+    retrieved_documents = payload["retrieved_documents"].strip().split(split_char)
 
     evaluator = DocumentMAPEvaluator()
 
@@ -57,8 +57,8 @@ def mrr():
 
     payload = request.json
     split_char = payload.get("split_char", ",")
-    ground_truth_documents = payload["ground_truth_documents"].split(split_char)
-    retrieved_documents = payload["retrieved_documents"].split(split_char)
+    ground_truth_documents = payload["ground_truth_documents"].strip().split(split_char)
+    retrieved_documents = payload["retrieved_documents"].strip().split(split_char)
 
     evaluator = DocumentMRREvaluator()
 
@@ -79,8 +79,8 @@ def recall():
     payload = request.json
 
     split_char = payload.get("split_char", ",")
-    ground_truth_documents = payload["ground_truth_documents"].split(split_char)
-    retrieved_documents = payload["retrieved_documents"].split(split_char)
+    ground_truth_documents = payload["ground_truth_documents"].strip().split(split_char)
+    retrieved_documents = payload["retrieved_documents"].strip().split(split_char)
 
     evaluator = DocumentRecallEvaluator(mode=RecallMode.SINGLE_HIT)
     if "mode" in payload:

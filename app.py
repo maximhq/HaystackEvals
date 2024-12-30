@@ -148,8 +148,11 @@ def recall():
 
     evaluator = DocumentRecallEvaluator(mode=RecallMode.SINGLE_HIT)
     if "mode" in payload:
-        mode = RecallMode(payload["mode"])
-        evaluator = DocumentRecallEvaluator(mode=mode)
+        mode = payload["mode"]
+        if mode == "SINGLE_HIT":
+            evaluator = DocumentRecallEvaluator(mode=RecallMode.SINGLE_HIT)
+        else:
+            evaluator = DocumentRecallEvaluator(mode=RecallMode.MULTI_HIT)
     print(f"Recall Mode: {mode}")
 
     ground_truth_documents = [

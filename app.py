@@ -34,9 +34,15 @@ def process_regex(input_string):
 def mape():
 
     payload = request.json
+    print("\n=== MAPE Evaluation Start ===")
+    print("Received payload:", json.dumps(payload, indent=2))
     split_char = payload.get("split_char", ",")
+    print(f"\nUsing split character: '{split_char}'")
     ground_truth_documents = payload["ground_truth_documents"].split(split_char)
     retrieved_documents = payload["retrieved_documents"].split(split_char)
+    print(f"\nInitial document counts:")
+    print(f"- Ground truth documents: {len(ground_truth_documents)}")
+    print(f"- Retrieved documents: {len(retrieved_documents)}")
 
     evaluator = DocumentMAPEvaluator()
 
@@ -50,11 +56,26 @@ def mape():
         for doc in retrieved_documents
         if len(doc.strip()) > 0
     ]
+    print(f"\nAfter filtering:")
+    print(f"- Ground truth docs: {len(ground_truth_documents)}")
+    print(f"- Retrieved docs: {len(retrieved_documents)}")
+    
+    print("\nGround Truth Documents Content:")
+    for i, doc in enumerate(ground_truth_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
+    
+    print("\nRetrieved Documents Content:")
+    for i, doc in enumerate(retrieved_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
 
     result = evaluator.run(
         ground_truth_documents=[ground_truth_documents],
         retrieved_documents=[retrieved_documents],
     )
+    print("\nEvaluation result:")
+    print(json.dumps(result, indent=2))
+    print("=== MAPE Evaluation End ===\n")
+
     response = {"mape": result["individual_scores"], "score": result["score"]}
     result = json.dumps(response)
     return Response(response=result, status=200, mimetype="application/json")
@@ -64,9 +85,15 @@ def mape():
 def mrr():
 
     payload = request.json
+    print("\n=== MRR Evaluation Start ===")
+    print("Received payload:", json.dumps(payload, indent=2))
     split_char = payload.get("split_char", ",")
+    print(f"\nUsing split character: '{split_char}'")
     ground_truth_documents = payload["ground_truth_documents"].split(split_char)
     retrieved_documents = payload["retrieved_documents"].split(split_char)
+    print(f"\nInitial document counts:")
+    print(f"- Ground truth documents: {len(ground_truth_documents)}")
+    print(f"- Retrieved documents: {len(retrieved_documents)}")
 
     evaluator = DocumentMRREvaluator()
 
@@ -80,10 +107,25 @@ def mrr():
         for doc in retrieved_documents
         if len(doc.strip()) > 0
     ]
+    print(f"\nAfter filtering:")
+    print(f"- Ground truth docs: {len(ground_truth_documents)}")
+    print(f"- Retrieved docs: {len(retrieved_documents)}")
+    
+    print("\nGround Truth Documents Content:")
+    for i, doc in enumerate(ground_truth_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
+    
+    print("\nRetrieved Documents Content:")
+    for i, doc in enumerate(retrieved_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
+
     result = evaluator.run(
         ground_truth_documents=[ground_truth_documents],
         retrieved_documents=[retrieved_documents],
     )
+    print("\nEvaluation result:")
+    print(json.dumps(result, indent=2))
+    print("=== MRR Evaluation End ===\n")
 
     response = {"mrr": result["individual_scores"], "score": result["score"]}
     result = json.dumps(response)
@@ -93,18 +135,23 @@ def mrr():
 @app.post("/api/document/evaluator/recall")
 def recall():
     payload = request.json
-
+    print("\n=== Recall Evaluation Start ===")
+    print("Received payload:", json.dumps(payload, indent=2))
+    mode = RecallMode.SINGLE_HIT
     split_char = payload.get("split_char", ",")
+    print(f"\nUsing split character: '{split_char}'")
     ground_truth_documents = payload["ground_truth_documents"].split(split_char)
     retrieved_documents = payload["retrieved_documents"].split(split_char)
+    print(f"\nInitial document counts:")
+    print(f"- Ground truth documents: {len(ground_truth_documents)}")
+    print(f"- Retrieved documents: {len(retrieved_documents)}")
 
     evaluator = DocumentRecallEvaluator(mode=RecallMode.SINGLE_HIT)
     if "mode" in payload:
-        mode = payload["mode"]
-        if mode == "SINGLE_HIT":
-            evaluator = DocumentRecallEvaluator(mode=RecallMode.SINGLE_HIT)
-        else:
-            evaluator = DocumentRecallEvaluator(mode=RecallMode.MULTI_HIT)
+        mode = RecallMode(payload["mode"])
+        evaluator = DocumentRecallEvaluator(mode=mode)
+    print(f"Recall Mode: {mode}")
+
     ground_truth_documents = [
         Document(content=doc.strip())
         for doc in ground_truth_documents
@@ -115,11 +162,25 @@ def recall():
         for doc in retrieved_documents
         if len(doc.strip()) > 0
     ]
+    print(f"\nAfter filtering:")
+    print(f"- Ground truth docs: {len(ground_truth_documents)}")
+    print(f"- Retrieved docs: {len(retrieved_documents)}")
+    
+    print("\nGround Truth Documents Content:")
+    for i, doc in enumerate(ground_truth_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
+    
+    print("\nRetrieved Documents Content:")
+    for i, doc in enumerate(retrieved_documents):
+        print(f"{i+1}. {doc.content[:100]}{'...' if len(doc.content) > 100 else ''}")
 
     result = evaluator.run(
         ground_truth_documents=[ground_truth_documents],
         retrieved_documents=[retrieved_documents],
     )
+    print("\nEvaluation result:")
+    print(json.dumps(result, indent=2))
+    print("=== Recall Evaluation End ===\n")
 
     response = {"recall": result["individual_scores"], "score": result["score"]}
     result = json.dumps(response)

@@ -1,4 +1,4 @@
-FROM python:3.11.9@sha256:a03f4e5b67980d474839e7b4d4a405871a4259690287d65060cff95d0cb311cd AS builder
+FROM python:3.14.7@sha256:4fad23465a06cc5149a541fbec6f87e234a64dc0550f6bfdd2d290d8f03240df AS builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
@@ -8,7 +8,7 @@ WORKDIR /app
 RUN python -m venv .venv
 COPY requirements.txt ./
 RUN .venv/bin/pip install -r requirements.txt
-FROM python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
+FROM python:3.14.7-slim@sha256:ce40764625a4ff50df3548277632e7f96c4e77fe75fa848aae9885476e7df5a4
 WORKDIR /app
 COPY --from=builder /app/.venv .venv/
 COPY . .
